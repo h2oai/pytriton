@@ -75,11 +75,11 @@ pipeline {
                     manager.createSummary("package.svg").appendText(text: summary, escapeHtml: false)
                 }
             }
-            post {
-                always {
-                    cleanWs()
-                }
-            }
+//            post {
+//                always {
+//                    cleanWs()
+//                }
+//            }
         }
     }
 }
