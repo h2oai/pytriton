@@ -33,15 +33,15 @@ pipeline {
             steps {
                 timeout(time: 20, unit: 'MINUTES') {
                     sh "make TRITONSERVER_IMAGE_VERSION=${params.TRITON_SERVER_CONTAINER_VERSION} TEST_CONTAINER_VERSION=${params.TRITON_SERVER_CONTAINER_VERSION} PYTHON_VERSIONS=${params.PYTHON_VERSIONS} extract-triton"
-                    archiveArtifacts 'pytriton/tritonserver/python_backend_stubs/**/python_backend_stub'
-                    stash includes: 'pytriton/tritonserver/python_backend_stubs/**/python_backend_stub', name: 'python_backend_stubs'
+                    archiveArtifacts 'pytriton/tritonserver/python_backend_stubs/**/triton_python_backend_stub'
+                    stash includes: 'pytriton/tritonserver/python_backend_stubs/**/triton_python_backend_stub', name: 'python_backend_stubs'
                 }
             }
-//            post {
-//                always {
-//                    cleanWs()
-//                }
-//            }
+            post {
+                always {
+                    cleanWs()
+                }
+            }
         }
 
         stage('3. Push to S3') {
@@ -67,7 +67,7 @@ pipeline {
                         keepPrivate = false
                     }
                     def links = params.PYTHON_VERSIONS.split(',')
-                            .collect { pyVersion -> "https://s3.amazonaws.com/artifacts.h2o.ai/deps/dai/triton/python_backend_stubs/${version}/${pyVersion}/python_backend_stub" }
+                            .collect { pyVersion -> "https://s3.amazonaws.com/artifacts.h2o.ai/deps/dai/triton/python_backend_stubs/${version}/${pyVersion}/triton_python_backend_stub" }
                             .collect { s3Url -> "<a href=\"${s3Url}\">${s3Url}</a>" }
                             .collect { link -> "<li>${link}</li>" }
                             .join()
@@ -75,11 +75,11 @@ pipeline {
                     manager.createSummary("package.svg").appendText(text: summary, escapeHtml: false)
                 }
             }
-//            post {
-//                always {
-//                    cleanWs()
-//                }
-//            }
+            post {
+                always {
+                    cleanWs()
+                }
+            }
         }
     }
 }
