@@ -37,11 +37,11 @@ pipeline {
                     stash includes: 'pytriton/tritonserver/python_backend_stubs/**/python_backend_stub', name: 'python_backend_stubs'
                 }
             }
-            post {
-                always {
-                    cleanWs()
-                }
-            }
+//            post {
+//                always {
+//                    cleanWs()
+//                }
+//            }
         }
 
         stage('3. Push to S3') {
