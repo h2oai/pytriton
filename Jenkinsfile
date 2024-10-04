@@ -66,7 +66,7 @@ pipeline {
                         localArtifact = 'pytriton/tritonserver/python_backend_stubs'
                         remoteArtifactBucket = 's3://artifacts.h2o.ai/deps'
                         groupId = 'dai'
-                        artifactId = 'triton/python_backend_stub'
+                        artifactId = 'triton/python_backend_stubs'
                         version = releaseVersion
                         keepPrivate = false
                         uploadEngine = 'awscli'
