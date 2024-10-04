@@ -45,6 +45,9 @@ pipeline {
         }
 
         stage('3. Push to S3') {
+            options {
+                skipDefaultCheckout()
+            }
             when {
                 anyOf {
                     expression { return params.UPLOAD_TO_S3 }
