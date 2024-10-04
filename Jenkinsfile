@@ -75,7 +75,7 @@ pipeline {
                             .collect { pyVersion -> "https://s3.amazonaws.com/artifacts.h2o.ai/deps/dai/triton/python_backend_stubs/${releaseVersion}/${pyVersion}/triton_python_backend_stub" }
                             .collect { s3Url -> "<a href=\"${s3Url}\">${s3Url}</a>" }
                             .collect { link -> "<li>${link}</li>" }
-                            .join()
+                            .join('')
                     def summary = "<h3>Upoaded artifacts</h3> <ul>${links}</ul>"
                     manager.createSummary("package.svg").appendText(text: summary, escapeHtml: false)
                 }
