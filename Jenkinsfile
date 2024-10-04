@@ -58,16 +58,17 @@ pipeline {
                 deleteDir()
                 unstash 'python_backend_stubs'
                 script {
-                    def version = "${params.TRITON_SERVER_CONTAINER_VERSION}"
+                    def releaseVersion = "${params.TRITON_SERVER_CONTAINER_VERSION}"
                     s3upDocker('harbor.h2o.ai', "library/awscli-x86_64") {
                         localArtifact = 'pytriton/tritonserver/python_backend_stubs'
-                        remoteArtifactBucket = 's3://artifacts.h2o.ai/deps/dai'
+                        remoteArtifactBucket = 's3://artifacts.h2o.ai/deps'
+                        groupId = 'dai'
                         artifactId = 'triton/python_backend_stub'
-                        version = version
+                        version = releaseVersion
                         keepPrivate = false
                     }
                     def links = params.PYTHON_VERSIONS.split(',')
-                            .collect { pyVersion -> "https://s3.amazonaws.com/artifacts.h2o.ai/deps/dai/triton/python_backend_stubs/${version}/${pyVersion}/triton_python_backend_stub" }
+                            .collect { pyVersion -> "https://s3.amazonaws.com/artifacts.h2o.ai/deps/dai/triton/python_backend_stubs/${releaseVersion}/${pyVersion}/triton_python_backend_stub" }
                             .collect { s3Url -> "<a href=\"${s3Url}\">${s3Url}</a>" }
                             .collect { link -> "<li>${link}</li>" }
                             .join()
