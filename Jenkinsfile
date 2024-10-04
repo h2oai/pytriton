@@ -32,7 +32,7 @@ pipeline {
             }
             steps {
                 timeout(time: 20, unit: 'MINUTES') {
-                    sh "make BUILD_NUMBER=${env.BUILD_ID} build"
+                    sh "make extract-triton"
                     archiveArtifacts 'pytriton/tritonserver/python_backend_stubs/**/python_backend_stub'
                     stash includes: 'pytriton/tritonserver/python_backend_stubs/**/python_backend_stub', name: 'python_backend_stubs'
                 }
