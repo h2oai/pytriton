@@ -32,7 +32,7 @@ pipeline {
             }
             steps {
                 timeout(time: 20, unit: 'MINUTES') {
-                    sh "make TRITONSERVER_IMAGE_VERSION=${params.TRITON_SERVER_CONTAINER_VERSION} PYTHON_VERSIONS=${params.PYTHON_VERSIONS} extract-triton"
+                    sh "make TRITONSERVER_IMAGE_VERSION=${params.TRITON_SERVER_CONTAINER_VERSION} TEST_CONTAINER_VERSION=${params.TRITON_SERVER_CONTAINER_VERSION} PYTHON_VERSIONS=${params.PYTHON_VERSIONS} extract-triton"
                     archiveArtifacts 'pytriton/tritonserver/python_backend_stubs/**/python_backend_stub'
                     stash includes: 'pytriton/tritonserver/python_backend_stubs/**/python_backend_stub', name: 'python_backend_stubs'
                 }
