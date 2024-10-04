@@ -69,6 +69,7 @@ pipeline {
                         artifactId = 'triton/python_backend_stub'
                         version = releaseVersion
                         keepPrivate = false
+                        uploadEngine = 'awscli'
                     }
                     def links = params.PYTHON_VERSIONS.split(',')
                             .collect { pyVersion -> "https://s3.amazonaws.com/artifacts.h2o.ai/deps/dai/triton/python_backend_stubs/${releaseVersion}/${pyVersion}/triton_python_backend_stub" }
