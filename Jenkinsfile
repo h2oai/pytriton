@@ -77,7 +77,7 @@ pipeline {
                             .collect { link -> "<li>${link}</li>" }
                             .join('')
                     def summary = "<h3>Upoaded artifacts</h3> <ul>${links}</ul>"
-                    manager.createSummary("package.svg").appendText(text: summary, escapeHtml: false)
+                    manager.createSummary("package.svg").appendText(summary, false)
                 }
             }
             post {
