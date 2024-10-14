@@ -6,14 +6,14 @@ pipeline {
     agent none
 
     parameters {
-        stringParam(
+        string(
                 name: 'TRITON_SERVER_CONTAINER_VERSION',
                 defaultValue: '22.12',
                 description: 'Version of the Triton Inference Server Container to be used (e.g. 22.12). \
 CUDA version inside the Triton Server Container should match the CUDA version in Driverless AI. \
 Refer https://docs.nvidia.com/deeplearning/triton-inference-server/release-notes/index.html for Triton Inference Server Container versions.',
         )
-        stringParam(
+        string(
                 name: 'PYTHON_VERSIONS',
                 defaultValue: '3.8,3.11',
                 description: 'Comma seperated list of Python versions that the backend stubs needs to be build for. (e.g. 3.8,3.9,3.10,3.11)',
