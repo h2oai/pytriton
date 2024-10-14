@@ -6,17 +6,23 @@ pipeline {
     agent none
 
     parameters {
-        string(
+        stringParam(
                 name: 'TRITON_SERVER_CONTAINER_VERSION',
                 defaultValue: '22.12',
-                description: 'Version of the Triton Inference Server Container to be used. CUDA version inside the Triton Server Container should match the CUDA version in Driverless AI. e.g. 22.12',
+                description: 'Version of the Triton Inference Server Container to be used (e.g. 22.12). \
+CUDA version inside the Triton Server Container should match the CUDA version in Driverless AI. \
+Refer https://docs.nvidia.com/deeplearning/triton-inference-server/release-notes/index.html for Triton Inference Server Container versions.',
         )
-        string(
+        stringParam(
                 name: 'PYTHON_VERSIONS',
                 defaultValue: '3.8,3.11',
-                description: 'Comma seperated list of Python versions that the backend stubs needs to be build for. e.g. 3.8,3.9,3.10,3.11',
+                description: 'Comma seperated list of Python versions that the backend stubs needs to be build for. (e.g. 3.8,3.9,3.10,3.11)',
         )
-        booleanParam(name: 'UPLOAD_TO_S3', defaultValue: true, description: 'Upload artifacts to S3')
+        booleanParam(
+                name: 'UPLOAD_TO_S3',
+                defaultValue: true,
+                description: 'Upload artifacts to S3',
+        )
     }
 
     options {
@@ -31,9 +37,13 @@ pipeline {
                 label "linux && docker && DC"
             }
             steps {
-                timeout(time: 20, unit: 'MINUTES') {
-                    sh "make TRITONSERVER_IMAGE_VERSION=${params.TRITON_SERVER_CONTAINER_VERSION} TEST_CONTAINER_VERSION=${params.TRITON_SERVER_CONTAINER_VERSION} PYTHON_VERSIONS=${params.PYTHON_VERSIONS} extract-triton"
-                    archiveArtifacts 'pytriton/tritonserver/python_backend_stubs/**/triton_python_backend_stub'
+                script {
+                    timeout(time: 20, unit: 'MINUTES') {
+                        sh "make TRITONSERVER_IMAGE_VERSION=${params.TRITON_SERVER_CONTAINER_VERSION} TEST_CONTAINER_VERSION=${params.TRITON_SERVER_CONTAINER_VERSION} PYTHON_VERSIONS=${params.PYTHON_VERSIONS} extract-triton"
+                    }
+                    if (!params.UPLOAD_TO_S3) {
+                        archiveArtifacts 'pytriton/tritonserver/python_backend_stubs/**/triton_python_backend_stub'
+                    }
                     stash includes: 'pytriton/tritonserver/python_backend_stubs/**/triton_python_backend_stub', name: 'python_backend_stubs'
                 }
             }
@@ -62,14 +72,16 @@ pipeline {
                 unstash 'python_backend_stubs'
                 script {
                     def releaseVersion = "${params.TRITON_SERVER_CONTAINER_VERSION}"
-                    s3upDocker('harbor.h2o.ai', "library/awscli-x86_64") {
-                        localArtifact = 'pytriton/tritonserver/python_backend_stubs'
-                        remoteArtifactBucket = 's3://artifacts.h2o.ai/deps'
-                        groupId = 'dai'
-                        artifactId = 'triton/python_backend_stubs'
-                        version = releaseVersion
-                        keepPrivate = false
-                        uploadEngine = 'awscli'
+                    timeout(time: 20, unit: 'MINUTES') {
+                        s3upDocker('harbor.h2o.ai', "library/awscli-x86_64") {
+                            localArtifact = 'pytriton/tritonserver/python_backend_stubs'
+                            remoteArtifactBucket = 's3://artifacts.h2o.ai/deps'
+                            groupId = 'dai'
+                            artifactId = 'triton/python_backend_stubs'
+                            version = releaseVersion
+                            keepPrivate = false
+                            uploadEngine = 'awscli'
+                        }
                     }
                     def links = params.PYTHON_VERSIONS.split(',')
                             .collect { pyVersion -> "https://s3.amazonaws.com/artifacts.h2o.ai/deps/dai/triton/python_backend_stubs/${releaseVersion}/${pyVersion}/triton_python_backend_stub" }
